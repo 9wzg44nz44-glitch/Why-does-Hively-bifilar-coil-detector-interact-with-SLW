@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How the Hively Bifilar Coil Receiving Antenna Works</title>
+  
+  <!-- MathJax for proper physics equation rendering -->
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)'], ['$', '$']],
+        displayMath: [['\\[', '\\]'], ['$$', '$$']],
+        processEscapes: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+  <style>
+    :root {
+      --bg: #0f1419;
+      --card: #1a2332;
+      --accent: #3b82f6;
+      --accent2: #22d3ee;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --success: #34d399;
+      --border: #2d3a4f;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%);
+      padding: 4rem 1.5rem 3rem;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at 30% 40%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+                  radial-gradient(circle at 70% 60%, rgba(34, 211, 238, 0.1) 0%, transparent 40%);
+      pointer-events: none;
+    }
+
+    .hero h1 {
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      background: linear-gradient(90deg, #60a5fa, #22d3ee);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      position: relative;
+    }
+
+    .hero .subtitle {
+      font-size: 1.15rem;
+      color: var(--muted);
+      max-width: 700px;
+      margin: 0 auto 1.5rem;
+      position: relative;
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(59, 130, 246, 0.2);
+      color: #93c5fd;
+      padding: 0.35rem 0.9rem;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border: 1px solid rgba(59, 130, 246, 0.4);
+      position: relative;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 4rem;
+    }
+
+    section {
+      margin-bottom: 2.5rem;
+    }
+
+    h2 {
+      font-size: 1.55rem;
+      color: #93c5fd;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    h2 .num {
+      background: var(--accent);
+      color: white;
+      width: 1.8rem;
+      height: 1.8rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    h3 {
+      font-size: 1.15rem;
+      color: var(--accent2);
+      margin: 1.4rem 0 0.6rem;
+    }
+
+    p {
+      margin-bottom: 1rem;
+      color: #cbd5e1;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.25rem 0;
+    }
+
+    .card.highlight {
+      border-color: rgba(34, 211, 238, 0.4);
+      background: linear-gradient(145deg, #1a2332, #0f1c2e);
+    }
+
+    .equation {
+      background: #0b1220;
+      border: 1px solid #1e3a5f;
+      border-radius: 10px;
+      padding: 1.35rem 1.5rem;
+      text-align: center;
+      margin: 1.4rem 0;
+      overflow-x: auto;
+      color: #e0f2fe;
+      font-size: 1.25rem;
+      line-height: 1.6;
+    }
+
+    /* Make MathJax display equations look clean */
+    .equation mjx-container {
+      margin: 0 !important;
+    }
+
+    .key-point {
+      display: flex;
+      gap: 0.9rem;
+      align-items: flex-start;
+      margin: 1rem 0;
+      padding: 0.9rem 1rem;
+      background: rgba(59, 130, 246, 0.08);
+      border-left: 4px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+    }
+
+    .key-point .icon {
+      font-size: 1.4rem;
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+    }
+
+    ul, ol {
+      margin: 0.8rem 0 1rem 1.5rem;
+      color: #cbd5e1;
+    }
+
+    li {
+      margin-bottom: 0.5rem;
+    }
+
+    .diagram {
+      background: #0b1220;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      text-align: center;
+    }
+
+    .diagram svg {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .diagram-caption {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-top: 0.8rem;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      margin: 1.5rem 0;
+    }
+
+    @media (max-width: 640px) {
+      .two-col {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .col-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem;
+    }
+
+    .col-card h4 {
+      color: var(--accent2);
+      margin-bottom: 0.6rem;
+      font-size: 1.05rem;
+    }
+
+    .summary-box {
+      background: linear-gradient(135deg, rgba(34, 211, 238, 0.12), rgba(59, 130, 246, 0.12));
+      border: 1px solid rgba(34, 211, 238, 0.35);
+      border-radius: 12px;
+      padding: 1.5rem 1.75rem;
+      margin-top: 1.5rem;
+    }
+
+    .summary-box h3 {
+      margin-top: 0;
+      color: #67e8f9;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .tag {
+      display: inline-block;
+      background: rgba(34, 211, 238, 0.15);
+      color: #67e8f9;
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-right: 0.3rem;
+    }
+
+    a {
+      color: #60a5fa;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="hero">
+    <span class="badge">Extended Electrodynamics · SLW</span>
+    <h1>How the Hively Bifilar Coil<br>Receiving Antenna Works</h1>
+    <p class="subtitle">
+      Why a specially wound bifilar coil produces an output current from an incident 
+      longitudinally polarized electric field (or vector potential) — with zero magnetic field.
+    </p>
+  </header>
+
+  <main class="container">
+
+    <!-- Question -->
+    <section>
+      <h2><span class="num">Q</span> The Question</h2>
+      <div class="card highlight">
+        <p style="margin:0; font-size:1.1rem;">
+          <strong>Why does the Hively bifilar coiled receiving antenna deliver an output current 
+          due to the incident longitudinally polarized electric field and/or the incident vector potential wave?</strong>
+        </p>
+      </div>
+    </section>
+
+    <!-- Core Answer -->
+    <section>
+      <h2><span class="num">1</span> Core Idea in One Sentence</h2>
+      <div class="card">
+        <p style="font-size:1.15rem; margin-bottom:0;">
+          The bifilar coil is geometrically matched to the <em>irrotational</em> (gradient-driven) character of the incident longitudinal fields. 
+          A longitudinal electric field \( \mathbf{E}_{L} \) (or the associated longitudinal vector potential \( \mathbf{A}_{L} \)) therefore drives a net current, 
+          while the magnetic field remains essentially zero.
+        </p>
+      </div>
+    </section>
+
+    <!-- EED Physics -->
+    <section>
+      <h2><span class="num">2</span> Core Physics from Extended Electrodynamics (EED)</h2>
+      
+      <p>
+        In Extended Electrodynamics (Hively and collaborators), the Helmholtz decomposition is taken seriously: 
+        any vector field splits into a <strong>solenoidal</strong> (transverse, divergence-free) part and an 
+        <strong>irrotational</strong> (longitudinal, curl-free) part. Classical electrodynamics largely discards 
+        or gauges away the irrotational sector; EED retains it.
+      </p>
+
+      <div class="key-point">
+        <span class="icon">⚡</span>
+        <div>
+          An irrotational current density \( \mathbf{J}_{L} = \nabla j \) produces (and is produced by) an irrotational 
+          vector potential \( \mathbf{A}_{L} = \nabla a \) and a longitudinal electric field \( \mathbf{E}_{L} \).
+        </div>
+      </div>
+
+      <div class="key-point">
+        <span class="icon">∅</span>
+        <div>
+          The associated magnetic field vanishes: \( \mathbf{B} = \nabla \times \mathbf{A}_{L} = 0 \).
+        </div>
+      </div>
+
+      <div class="key-point">
+        <span class="icon">🌊</span>
+        <div>
+          The dynamical scalar field \( C = \nabla \cdot \mathbf{A} + \frac{1}{c^{2}}\frac{\partial\Phi}{\partial t} \) is nonzero 
+          and travels with the longitudinal \( \mathbf{E} \)-field, forming the <strong>scalar-longitudinal wave (SLW)</strong>. 
+          The wave carries energy and momentum without a magnetic component and is unconstrained by the classical skin effect.
+        </div>
+      </div>
+
+      <h3>Constitutive Relation</h3>
+      <p>Inside a conductor (low-frequency / quasi-static limit):</p>
+      <div class="equation">
+        \[ \mathbf{J}_{L} \approx \sigma \mathbf{E}_{L} \]
+      </div>
+      <p>
+        Because \( \mathbf{E}_{L} \) is itself a gradient (or the time derivative of a gradient potential), 
+        the driven current is likewise irrotational.
+      </p>
+    </section>
+
+    <!-- Bifilar Geometry -->
+    <section>
+      <h2><span class="num">3</span> Why the Bifilar Geometry Responds</h2>
+
+      <p>
+        The Hively bifilar (or bifilar-pancake) coil is wound so that the two conductors run side-by-side 
+        (or in alternating turns) and are connected at the center (or appropriately terminated) such that 
+        any current that does flow travels in <strong>opposite directions in adjacent turns</strong>.
+      </p>
+
+      <!-- Simple SVG Diagram -->
+      <div class="diagram">
+        <svg viewBox="0 0 480 220" xmlns="http://www.w3.org/2000/svg" aria-label="Simplified bifilar coil diagram">
+          <!-- Background -->
+          <rect width="480" height="220" fill="#0b1220" rx="8"/>
+          
+          <!-- Coil turns - simplified concentric arcs representing bifilar -->
+          <!-- Outer turns -->
+          <path d="M 80 110 A 90 90 0 0 1 400 110" fill="none" stroke="#3b82f6" stroke-width="4" stroke-linecap="round"/>
+          <path d="M 95 110 A 75 75 0 0 1 385 110" fill="none" stroke="#22d3ee" stroke-width="4" stroke-linecap="round"/>
+          <path d="M 110 110 A 60 60 0 0 1 370 110" fill="none" stroke="#3b82f6" stroke-width="4" stroke-linecap="round"/>
+          <path d="M 125 110 A 45 45 0 0 1 355 110" fill="none" stroke="#22d3ee" stroke-width="4" stroke-linecap="round"/>
+          <path d="M 140 110 A 30 30 0 0 1 340 110" fill="none" stroke="#3b82f6" stroke-width="4" stroke-linecap="round"/>
+          
+          <!-- Center connection -->
+          <circle cx="240" cy="110" r="12" fill="#1e3a5f" stroke="#67e8f9" stroke-width="2"/>
+          <text x="240" y="115" text-anchor="middle" fill="#a5f3fc" font-size="11" font-family="sans-serif">Center</text>
+          
+          <!-- Current arrows -->
+          <defs>
+            <marker id="arrowBlue" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L6,3 L0,6 Z" fill="#60a5fa"/>
+            </marker>
+            <marker id="arrowCyan" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L6,3 L0,6 Z" fill="#22d3ee"/>
+            </marker>
+          </defs>
+          
+          <!-- Labels -->
+          <text x="50" y="50" fill="#93c5fd" font-size="13" font-family="sans-serif">Conductor 1</text>
+          <line x1="50" y1="58" x2="90" y2="85" stroke="#3b82f6" stroke-width="1.5"/>
+          
+          <text x="380" y="50" fill="#67e8f9" font-size="13" font-family="sans-serif">Conductor 2</text>
+          <line x1="430" y1="58" x2="390" y2="85" stroke="#22d3ee" stroke-width="1.5"/>
+          
+          <text x="240" y="195" text-anchor="middle" fill="#94a3b8" font-size="12" font-family="sans-serif">
+            Adjacent turns carry current in opposite directions → B ≈ 0
+          </text>
+        </svg>
+        <p class="diagram-caption">
+          Simplified schematic of a bifilar coil. Blue and cyan traces represent the two interleaved conductors. 
+          Current flows in opposite directions in neighboring turns, cancelling the net magnetic field.
+        </p>
+      </div>
+
+      <div class="two-col">
+        <div class="col-card">
+          <h4>Magnetic Cancellation</h4>
+          <p style="margin:0; font-size:0.95rem;">
+            Opposing currents cancel the net magnetic moment and the net inductance. 
+            The coil cannot support ordinary eddy currents or respond inductively to a transverse \( \mathbf{B} \)-field.
+          </p>
+        </div>
+        <div class="col-card">
+          <h4>Gradient Response</h4>
+          <p style="margin:0; font-size:0.95rem;">
+            What remains is a pure gradient response. An incident longitudinal \( \mathbf{E}_{L} \) 
+            (or \( -\partial\mathbf{A}_{L}/\partial t \)) imposes a potential gradient along the conductors, 
+            driving a coherent irrotational current to the terminals.
+          </p>
+        </div>
+      </div>
+
+      <div class="key-point">
+        <span class="icon">🎯</span>
+        <div>
+          <strong>No opposing eddy-current loops cancel the signal</strong>, because there is no incident \( \mathbf{B} \) to induce them. 
+          The coil is a geometric filter matched to the irrotational sector.
+        </div>
+      </div>
+
+      <p>
+        Ordinary loop or dipole antennas respond primarily to the solenoidal (\( \mathbf{B} \)- and transverse-\( \mathbf{E} \)) sector. 
+        The bifilar coil is essentially blind to that sector and open to the longitudinal sector.
+      </p>
+    </section>
+
+    <!-- Vector Potential -->
+    <section>
+      <h2><span class="num">4</span> Vector-Potential Picture</h2>
+
+      <p>
+        Even if one prefers to speak in potentials rather than fields, the same conclusion follows. 
+        An incident longitudinal vector potential \( \mathbf{A}_{L} = \nabla a \) (curl-free) produces an electric field:
+      </p>
+
+      <div class="equation">
+        \[ \mathbf{E}_{L} = -\nabla\Phi - \frac{\partial\mathbf{A}_{L}}{\partial t} \]
+      </div>
+
+      <p>
+        Inside the conductors the charges rearrange (or a current flows) until the total force vanishes in the steady state, 
+        or until a continuous current is sustained by the time-varying part. Because the bifilar geometry forces any current 
+        to be counter-directed in adjacent turns, the only consistent solution is the gradient-driven (irrotational) current 
+        that the coil was designed to accept.
+      </p>
+
+      <div class="card">
+        <p style="margin:0;">
+          Thus the observed output current is the direct macroscopic manifestation of the incident longitudinally polarized 
+          electric field (or its underlying longitudinal vector potential) acting on a structure whose topology admits 
+          only irrotational current.
+        </p>
+      </div>
+    </section>
+
+    <!-- Summary -->
+    <section>
+      <h2><span class="num">5</span> Summary</h2>
+      <div class="summary-box">
+        <h3>Key Takeaways</h3>
+        <ul style="margin-top:0.8rem;">
+          <li>SLWs possess a longitudinal \( \mathbf{E} \)-field and a dynamical scalar field \( C \), but <strong>no magnetic field</strong>.</li>
+          <li>The bifilar winding forces currents in opposite directions → net \( \mathbf{B} \approx 0 \) and near-zero inductance.</li>
+          <li>This leaves the coil sensitive only to gradient-driven (irrotational) currents produced by \( \mathbf{E}_{L} \) or \( \partial\mathbf{A}_{L}/\partial t \).</li>
+          <li>Result: a measurable terminal current appears when an SLW is incident, even though classical inductive coupling is suppressed.</li>
+        </ul>
+        <p style="margin-top:1rem; margin-bottom:0; font-size:0.95rem; color:#94a3b8;">
+          Based on Hively’s 2016 US Patent 9,306,527 and the framework of Extended Electrodynamics (EED).
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    Presentation of the physics of the Hively bifilar SLW receiving antenna<br>
+    For educational discussion of Extended Electrodynamics concepts
+  </footer>
+
+</body>
+</html>
